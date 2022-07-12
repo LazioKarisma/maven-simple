@@ -6,20 +6,30 @@ agent any;
 	}
 	
 	stages {
-		stage ('Compile'){
+		stage ("Build"){
 		  steps {
-			sh "mvn clean compile"  
+			 // Get some code from a GitHub repository 
+            git 'https://github.com/LazioKarisma/maven-simple.git'
+            sh "mvn -Dmaven.test.failure.ignore=true clean compile"
 			}		
 		}
 	
-		stage ('Test') {
+		stage ("Test") {
 		steps {
-				sh "mvn clean test"
+            git 'https://github.com/LazioKarisma/maven-simple.git'
+            sh "mvn -Dmaven.test.failure.ignore=true clean test"
 			}
 		}
-		stage('Deploy') {
-		sh "mvn clean install"
-		}
+		stage("Deploy") {
+            git 'https://github.com/LazioKarisma/maven-simple.git'
+            sh "mvn -Dmaven.test.failure.ignore=true clean install"
+		}  
+		post {
+              success {
+                  archiveArtifacts 'target/*.jar'
+              }
+
+          }
 	}
 }
 	

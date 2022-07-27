@@ -1,42 +1,27 @@
 pipeline {
-   agent any
+    agent any
+  
+  	tools { 
+        maven 'maven-3.8.1'
+        jdk 'jdk8' 
+    }
 
-   tools {
-      // Install the Maven version configured as "M3" and add it to the path.
-      maven "M3"
-   }
+    stages {
+        stage('Build') {
+            steps {
+                // To run Maven on a Windows agent, use
+                 bat 'mvn clean test'
+            }
 
-   stages {
-      stage('Build') {
-         steps {
-            // Get some code from a GitHub repository 
-            git 'https://github.com/LazioKarisma/maven-simple.git'
-            sh "mvn -Dmaven.test.failure.ignore=true clean compile"
-         }
-         }
-      stage("Test") {
-          steps {
-            git 'https://github.com/LazioKarisma/maven-simple.git'  
-            sh "mvn -Dmaven.test.failure.ignore=true clean test"
-            
-          }
-
-      }
-      stage("Deploy") {
-          steps {
-            git 'https://github.com/LazioKarisma/maven-simple.git'  
-            sh "mvn -Dmaven.test.failure.ignore=true clean install"
-            
-          }
-          post {
-              success {
-                  archiveArtifacts 'target/*.jar'
-              }
-
-          }
-
-
-      }
-
-      }
-   }
+            post {
+                // If Maven was able to run the tests, even if some of the test
+                // failed, record the test results and archive the jar file.
+                success {
+                    //junit '**/target/surefire-reports/TEST-*.xml'
+                    //archiveArtifacts 'target/*.jar'
+					echo 'success'
+                }
+            }
+        }
+    }
+}
